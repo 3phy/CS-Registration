@@ -1,9 +1,9 @@
 <?php
-$servername = getenv('localhost');
-$username   = getenv('root');
-$password   = getenv('');
-$dbname     = getenv('comsa_db');
-$port       = getenv('3306');
+$servername = getenv('DB_HOST');
+$username   = getenv('DB_USER');
+$password   = getenv('DB_PASSWORD');
+$dbname     = getenv('DB_DATABASE');
+$port       = getenv('DB_PORT');
 
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
