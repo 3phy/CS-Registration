@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>COMSA Form</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Class Registration Form</h2>
+  <form action="save.php" method="post" enctype="multipart/form-data">
+    
+    <!-- Name -->
+    <input type="text" name="name" placeholder="Full Name" required>
+
+    <!-- Student No -->
+    <input type="text" name="student_no" placeholder="Student No." required>
+
+    <!-- Role -->
+    <select name="role" id="role" required onchange="updatePositionOptions()">
+      <option value="" disabled selected>Select Role</option>
+      <option value="Executive">Executive</option>
+      <option value="Class Officer">Class Officers</option>
+      <option value="Member">Member</option>
+    </select>
+
+    <!-- Position -->
+    <select name="position" id="position" required>
+      <option value="" disabled selected>Select Position</option>
+    </select>
+
+    <script>
+      const positions = {
+      "Executive": [
+        "President",
+        "Vice President Internal",
+        "Vice President External",
+        "Secretary",
+        "Treasurer",
+        "Auditor",
+        "P.R.O. Male",
+        "P.R.O Female",
+        "1st Year Representative Male",
+        "1st Year Representative Female",
+        "2nd Year Representative Male",
+        "2nd Year Representative Female",
+        "3rd Year Representative Male",
+        "4th Year Representative Female",
+        "Creatives and Multimedia Committee Head",
+        "Student's Behavior Discipline and Grievance Committee Head",
+        "Computer Science, Information, and Technology Committee Head"
+
+      ],
+      "Class Officer": [
+        "Mayor",
+        "Vice Mayor",
+        "Secretary",
+        "Treasurer",
+        "Auditor",
+        "Escort",
+        "Muse"
+      ],
+      "Member": [
+        "Member"
+      ]
+      };
+
+      function updatePositionOptions() {
+      const role = document.getElementById('role').value;
+      const positionSelect = document.getElementById('position');
+      positionSelect.innerHTML = '<option value="" disabled selected>Select Position</option>';
+      if (positions[role]) {
+        positions[role].forEach(function(pos) {
+        const opt = document.createElement('option');
+        opt.value = pos;
+        opt.textContent = pos;
+        positionSelect.appendChild(opt);
+        });
+      }
+      }
+    </script>
+
+    <!-- Address -->
+    <input type="text" name="address" placeholder="Address">
+
+    <!-- Course -->
+    <select name="course" required>
+      <option value="" disabled selected>College, Program, Major, and Section</option>
+      <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - A">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - A</option>
+      <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - B">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - B</option>
+      <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - C">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - C</option>
+    </select>
+
+    <!-- Year Level -->
+    <select name="year_level" required>
+      <option value="" disabled selected>Year Level</option>
+      <option value="1st Year">1st Year</option>
+      <option value="2nd Year">2nd Year</option>
+      <option value="3rd Year">3rd Year</option>
+      <option value="4th Year">4th Year</option>
+    </select>
+
+    <!-- Landline (optional) -->
+    <input type="text" name="landline" placeholder="Mobile Number" required>
+
+    <!-- Emergency Contact Person -->
+    <input type="text" name="contact_person" placeholder="Emergency Contact Person" required>
+
+    <!-- Emergency Contact Number -->
+    <input type="text" name="mobile" placeholder="Emergency Contact Number"required>
+
+    <!-- Profile Picture -->
+    <label>Upload Profile Picture:</label>
+    <input type="file" name="profile_pic" accept="image/*" required>
+
+    <!-- Submit -->
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
