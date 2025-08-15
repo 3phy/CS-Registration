@@ -1,7 +1,7 @@
 <?php
-require 'db_config.php';
+require '../db_config.php';
 
-$upload_dir = 'uploads/';
+$upload_dir = '../uploads/';
 if (!is_dir($upload_dir)) {
     mkdir($upload_dir, 0777, true);
 }
@@ -12,7 +12,7 @@ if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_
     $filename = basename($_FILES['profile_pic']['name']);
     $ext = pathinfo($filename, PATHINFO_EXTENSION);
     $new_name = uniqid('pic_', true) . '.' . $ext; // Unique file name
-    $target_path = $upload_dir . $new_name;
+    $target_path = $upload_dir . '/' . $new_name;
 
     // Optional: Validate file size (max 5MB) and type (jpg/png)
     if ($_FILES['profile_pic']['size'] > 5 * 1024 * 1024) {
@@ -52,7 +52,7 @@ $stmt->bind_param("sssssssssss",
 
 // Execute and respond
 if ($stmt->execute()) {
-    echo "✅ Officer saved successfully! <a href='admin/dashboard.php'>Go to Dashboard</a>";
+    echo "✅ Officer saved successfully! <a href='../admin/dashboard.php'>Go to Dashboard</a>";
 } else {
     echo "❌ Error: " . $stmt->error;
 }

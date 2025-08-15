@@ -196,7 +196,14 @@ $result = $conn->query("SELECT * FROM class_officers $whereClause $orderBy");
     <table class="officer-table">
       <tr>
         <td rowspan="11" class="officer-photo">
-          <img src="../<?= htmlspecialchars($row['profile_pic']) ?>" alt="Photo">
+          <?php
+            $profilePicPath = '../uploads/' . ltrim($row['profile_pic'], '/');
+            if (!empty($row['profile_pic']) && file_exists($profilePicPath)) {
+          echo '<img src="' . htmlspecialchars($profilePicPath) . '" alt="Photo">';
+            } else {
+          echo '<span>No photo</span>';
+            }
+          ?>
         </td>
         <td><strong>Name:</strong> <?= htmlspecialchars($row['name']) ?></td>
       </tr>
@@ -209,7 +216,14 @@ $result = $conn->query("SELECT * FROM class_officers $whereClause $orderBy");
       <tr><td><strong>Contact Person (in case of emergency):</strong> <?= htmlspecialchars($row['contact_person']) ?></td></tr>
       <tr><td><strong>Emergency Landline/Mobile No.:</strong> <?= htmlspecialchars($row['mobile']) ?></td></tr>
       <tr><td class="signature"><strong>Signature</strong><br>__________________________</td></tr>
-      <tr><td style="text-align:right;"><a href="edit_officer.php?id=<?= $row['id'] ?>" class="edit-link">✏️ Edit</a></td></tr>
+      <tr>
+        <td style="text-align:right;">
+          <a href="edit_officer.php?id=<?= htmlspecialchars($row['id']) ?>" class="edit-link">✏️ Edit</a>
+            <form method="POST" action="delete.php?id=<?= htmlspecialchars($row['id']) ?>" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this officer?');">
+            <button type="submit" style="background:none;border:none;color:red;cursor:pointer;">🗑️ Delete</button>
+            </form>
+        </td>
+      </tr>
     </table>
   <?php endwhile; ?>
 <?php else: ?>
