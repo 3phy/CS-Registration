@@ -38,6 +38,14 @@ if ($role === 'Executive') {
 
 $result = $conn->query("SELECT * FROM class_officers $whereClause $orderBy");
 
+// Convert result to array for easier manipulation
+$officers = [];
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $officers[] = $row;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +81,7 @@ $result = $conn->query("SELECT * FROM class_officers $whereClause $orderBy");
     .officer-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 60px;
+      margin-bottom: 20px;
       font-size: 14px;
     }
 
@@ -104,23 +112,63 @@ $result = $conn->query("SELECT * FROM class_officers $whereClause $orderBy");
       margin-top: 10px;
     }
 
+    .page-group {
+      page-break-after: always;
+      margin-bottom: 40px;
+    }
+
+    .page-group:last-child {
+      page-break-after: auto;
+    }
+
     @media print {
       form, .edit-link {
         display: none !important;
       }
 
+      .page-group {
+        page-break-after: always;
+        margin-bottom: 0;
+      }
+
+      .page-group:last-child {
+        page-break-after: auto;
+      }
+
+      .print-header {
+        margin-bottom: 20px;
+      }
+
       .officer-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-size: 12px;
         page-break-inside: avoid;
+      }
+
+      .officer-table td {
+        border: 1px solid #000;
+        padding: 4px 8px;
+        vertical-align: top;
+      }
+
+      .officer-photo img {
+        max-width: 120px;
+        border: 1px solid #000;
+      }
+
+      .signature {
+        padding-top: 20px;
+        text-align: center;
+        font-style: italic;
+      }
+
+      body {
+        margin: 20px;
       }
     }
 
-    .filter-form {
-      margin-bottom: 20px;
-    }
-
-    .filter-form label {
-      margin-right: 10px;
-    }
   </style>
 </head>
 <body>
@@ -162,71 +210,92 @@ $result = $conn->query("SELECT * FROM class_officers $whereClause $orderBy");
   <button type="button" onclick="window.print()">🖨️ Print</button>
 </form>
 
-<!-- Header -->
-<div class="print-header">
-  <div class="header-logos">
-    <img src="../assets/img/EARIST.png" alt="Left Logo" style="margin-left: 60px;">
-    <div class="header-title">
-      <div>Republic of the Philippines</div>
-      <div><strong>EULOGIO "AMANG" RODRIGUEZ<br>INSTITUTE OF SCIENCE AND TECHNOLOGY</strong></div>
-      <div>Nagtahan, Sampaloc, Manila</div>
-      <br>
-      <div><strong>COMPUTER SCIENCE STUDENT ASSOCIATION</strong></div>
-<div><strong>
-  <?php
-    if ($role === 'Executive') {
-        echo 'EXECUTIVE OFFICERS LIST';
-    } elseif ($role === 'Class Officer') {
-        echo 'CLASS OFFICERS LIST';
-    } elseif ($role === 'Member') {
-        echo 'MEMBERS LIST';
-    } else {
-        echo 'LIST';
-    }
+<?php if (!empty($officers)): ?>
+  <?php 
+  // Group officers into chunks of 3
+  $officerChunks = array_chunk($officers, 3);
   ?>
-</strong></div>
+  
+  <?php foreach ($officerChunks as $chunkIndex => $chunk): ?>
+    <div class="page-group">
+      <!-- Header for each page -->
+      <div class="print-header">
+        <div class="header-logos">
+          <img src="../assets/img/EARIST.png" alt="Left Logo" style="margin-left: 60px;">
+          <div class="header-title" style="font-size: 13px;">
+            <div>Republic of the Philippines</div>
+            <div><strong>EULOGIO "AMANG" RODRIGUEZ<br>INSTITUTE OF SCIENCE AND TECHNOLOGY</strong></div>
+            <div>Nagtahan, Sampaloc, Manila</div>
+            <br><div><strong>COMPUTER SCIENCE STUDENT ASSOCIATION</strong></div>
+            <div><strong>
+              <?php
+                if ($role === 'Executive') {
+                    echo 'EXECUTIVE OFFICERS LIST';
+                } elseif ($role === 'Class Officer') {
+                    echo 'CLASS OFFICERS LIST';
+                } elseif ($role === 'Member') {
+                    echo 'MEMBERS LIST';
+                } else {
+                    echo 'LIST';
+                }
+              ?>
+            </strong></div>
+          </div>
+          <img src="../assets/img/comsa.png" alt="Right Logo" style="margin-right: 70px;">
+        </div>
+      </div>
 
+      <!-- Officers in this chunk (up to 3) -->
+      <?php foreach ($chunk as $row): ?>
+        <table class="officer-table">
+          <tr>
+            <td rowspan="11" class="officer-photo">
+              <?php
+                $profilePicPath = '../uploads/' . ltrim($row['profile_pic'], '/');
+                if (!empty($row['profile_pic']) && file_exists($profilePicPath)) {
+                    echo '<img src="' . htmlspecialchars($profilePicPath) . '" alt="Photo">';
+                } else {
+                    echo '<span>No photo</span>';
+                }
+              ?>
+            </td>
+            <td><strong>Name:</strong> <?= htmlspecialchars($row['name']) ?></td>
+          </tr>
+          <tr><td><strong>Student No.:</strong> <?= htmlspecialchars($row['student_no']) ?></td></tr>
+          <tr><td><strong>Position:</strong> <?= htmlspecialchars($row['position']) ?></td></tr>
+          <tr><td><strong>Address:</strong> <?= htmlspecialchars($row['address']) ?></td></tr>
+          <tr><td><strong>College, Program, Major, Section:</strong> <?= htmlspecialchars($row['course']) ?></td></tr>
+          <tr><td><strong>Year Level:</strong> <?= htmlspecialchars($row['year_level']) ?></td></tr>
+          <tr><td><strong>Landline/Mobile No.:</strong> <?= htmlspecialchars($row['landline']) ?></td></tr>
+          <tr><td><strong>Contact Person (in case of emergency):</strong> <?= htmlspecialchars($row['contact_person']) ?></td></tr>
+          <tr><td><strong>Emergency Landline/Mobile No.:</strong> <?= htmlspecialchars($row['mobile']) ?></td></tr>
+          <tr><td class="signature"><strong>Signature</strong><br>__________________________</td></tr>
+          <tr>
+            <td style="text-align:right;">
+              <a href="edit_officer.php?id=<?= htmlspecialchars($row['id']) ?>" class="edit-link">✏️ Edit</a>
+              <form method="POST" action="delete.php?id=<?= htmlspecialchars($row['id']) ?>" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this officer?');">
+                <button type="submit" style="background:none;border:none;color:red;cursor:pointer;">🗑️ Delete</button>
+              </form>
+            </td>
+          </tr>
+        </table>
+      <?php endforeach; ?>
     </div>
-    <img src="../assets/img/comsa.png" alt="Right Logo" style="margin-right: 70px;">
-  </div>
-</div>
-
-<?php if ($result && $result->num_rows > 0): ?>
-  <?php while ($row = $result->fetch_assoc()): ?>
-    <table class="officer-table">
-      <tr>
-        <td rowspan="11" class="officer-photo">
-          <?php
-            $profilePicPath = '../uploads/' . ltrim($row['profile_pic'], '/');
-            if (!empty($row['profile_pic']) && file_exists($profilePicPath)) {
-          echo '<img src="' . htmlspecialchars($profilePicPath) . '" alt="Photo">';
-            } else {
-          echo '<span>No photo</span>';
-            }
-          ?>
-        </td>
-        <td><strong>Name:</strong> <?= htmlspecialchars($row['name']) ?></td>
-      </tr>
-      <tr><td><strong>Student No.:</strong> <?= htmlspecialchars($row['student_no']) ?></td></tr>
-      <tr><td><strong>Position:</strong> <?= htmlspecialchars($row['position']) ?></td></tr>
-      <tr><td><strong>Address:</strong> <?= htmlspecialchars($row['address']) ?></td></tr>
-      <tr><td><strong>College, Program, Major, Section:</strong> <?= htmlspecialchars($row['course']) ?></td></tr>
-      <tr><td><strong>Year Level:</strong> <?= htmlspecialchars($row['year_level']) ?></td></tr>
-      <tr><td><strong>Landline/Mobile No.:</strong> <?= htmlspecialchars($row['landline']) ?></td></tr>
-      <tr><td><strong>Contact Person (in case of emergency):</strong> <?= htmlspecialchars($row['contact_person']) ?></td></tr>
-      <tr><td><strong>Emergency Landline/Mobile No.:</strong> <?= htmlspecialchars($row['mobile']) ?></td></tr>
-      <tr><td class="signature"><strong>Signature</strong><br>__________________________</td></tr>
-      <tr>
-        <td style="text-align:right;">
-          <a href="edit_officer.php?id=<?= htmlspecialchars($row['id']) ?>" class="edit-link">✏️ Edit</a>
-            <form method="POST" action="delete.php?id=<?= htmlspecialchars($row['id']) ?>" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this officer?');">
-            <button type="submit" style="background:none;border:none;color:red;cursor:pointer;">🗑️ Delete</button>
-            </form>
-        </td>
-      </tr>
-    </table>
-  <?php endwhile; ?>
+  <?php endforeach; ?>
 <?php else: ?>
+  <div class="print-header">
+    <div class="header-logos">
+      <img src="../assets/img/EARIST.png" alt="Left Logo" style="margin-left: 60px;">
+      <div class="header-title" style="font-size: 13px;">
+        <div>Republic of the Philippines</div>
+        <div><strong>EULOGIO "AMANG" RODRIGUEZ<br>INSTITUTE OF SCIENCE AND TECHNOLOGY</strong></div>
+        <div>Nagtahan, Sampaloc, Manila</div>
+        <br><div><strong>COMPUTER SCIENCE STUDENT ASSOCIATION</strong></div>
+        <div><strong>LIST</strong></div>
+      </div>
+      <img src="../assets/img/comsa.png" alt="Right Logo" style="margin-right: 70px;">
+    </div>
+  </div>
   <p>No class officers found.</p>
 <?php endif; ?>
 

@@ -52,8 +52,42 @@ $stmt->bind_param("sssssssssss",
 
 // Execute and respond
 if ($stmt->execute()) {
-    echo "✅ Officer saved successfully! <a href='../admin/dashboard.php'>Go to Dashboard</a>";
+    // Fetch the newly inserted officer for verification
+    $last_id = $conn->insert_id;
+    $result = $conn->query("SELECT * FROM class_officers WHERE id = $last_id");
+    if ($result && $result->num_rows > 0):
+        $row = $result->fetch_assoc();
+?>
+    <div class="officer-summary" style="max-width:400px;margin:auto;padding:20px;border:1px solid #ccc;border-radius:8px;">
+        <h3>Officer Details Submitted</h3>
+        <ul style="list-style:none;padding:0;">
+            <li><strong>Name:</strong> <?= htmlspecialchars($row['name']) ?></li>
+            <li><strong>Student No.:</strong> <?= htmlspecialchars($row['student_no']) ?></li>
+            <li><strong>Position:</strong> <?= htmlspecialchars($row['position']) ?></li>
+            <li><strong>Address:</strong> <?= htmlspecialchars($row['address']) ?></li>
+            <li><strong>Course:</strong> <?= htmlspecialchars($row['course']) ?></li>
+            <li><strong>Year Level:</strong> <?= htmlspecialchars($row['year_level']) ?></li>
+            <li><strong>Landline/Mobile No.:</strong> <?= htmlspecialchars($row['landline']) ?></li>
+            <li><strong>Contact Person:</strong> <?= htmlspecialchars($row['contact_person']) ?></li>
+            <li><strong>Emergency No.:</strong> <?= htmlspecialchars($row['mobile']) ?></li>
+            <li><strong>Role:</strong> <?= htmlspecialchars($row['role']) ?></li>
+        </ul>
+        <?php
+            $profilePicPath = '../uploads/' . ltrim($row['profile_pic'], '/');
+            if (!empty($row['profile_pic']) && file_exists($profilePicPath)) {
+                echo '<div style="margin-top:10px;"><img src="' . htmlspecialchars($profilePicPath) . '" alt="Photo" style="max-width:100px;border-radius:4px;"></div>';
+            }
+        ?>
+        <div style="text-align:center; margin-top:20px;">
+            <button type="button" onclick="window.location.href='../index.html';" style="padding:10px 20px;">✅ Done</button>
+        </div>
+    </div>
+<?php
+    else:
+        echo "❌ Error fetching officer details.";
+    endif;
 } else {
     echo "❌ Error: " . $stmt->error;
 }
+
 ?>

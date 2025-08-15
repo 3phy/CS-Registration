@@ -2,34 +2,432 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>COMSA Form</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2d5a27, #4a8c3a, #2d5a27);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Large decorative background elements */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      right: -10%;
+      width: 60vw;
+      height: 120vh;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="2"/><circle cx="100" cy="100" r="60" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><circle cx="100" cy="100" r="40" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/></svg>') no-repeat center;
+      background-size: contain;
+      z-index: 0;
+      opacity: 0.7;
+      transform: rotate(15deg);
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: -15%;
+      width: 40vw;
+      height: 80vh;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><polygon points="100,20 180,180 20,180" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>') no-repeat center;
+      background-size: contain;
+      z-index: 0;
+      opacity: 0.5;
+      transform: rotate(-20deg);
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .logo::before {
+      content: '';
+      width: 80px;
+      height: 80px;
+      background: #2d5a27;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo::after {
+      content: ' ';
+      background-image: url('assets/img/comsa.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 80px;
+      height: 80px;
+      left: 20px;
+      top: 20px;
+      position: absolute;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 768px) {
+      .logo::after {
+      width: 80px;
+      height: 80px;
+      left: 10px;
+      top: 10px;
+      min-width: 30px;
+      min-height: 30px;
+      }
+    }
+
+    .form-header {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      padding: 1rem 3rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .form-header h2 {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .form-container {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 800px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    /* Floating Label Styles */
+    .floating-label {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .floating-label input,
+    .floating-label select {
+      width: 100%;
+      padding: 20px 20px 15px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: white;
+      outline: none;
+    }
+
+    .floating-label label {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      background: white;
+      padding: 0 5px;
+      color: #999;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* When input is focused or has value */
+    .floating-label input:focus + label,
+    .floating-label input:not(:placeholder-shown) + label,
+    .floating-label input.has-value + label,
+    .floating-label select:focus + label,
+    .floating-label select.has-value + label {
+      top: -2px;
+      left: 15px;
+      transform: translateY(0);
+      font-size: 12px;
+      color: #4a8c3a;
+      font-weight: 600;
+    }
+
+    .floating-label input:focus,
+    .floating-label select:focus {
+      border-color: #4a8c3a;
+      box-shadow: 0 0 0 3px rgba(74, 140, 58, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Select specific styles */
+    .floating-label select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 20px;
+    }
+
+    /* Hide placeholder initially */
+    .floating-label input::placeholder {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .floating-label input:focus::placeholder {
+      opacity: 0.5;
+    }
+
+    .file-input-container {
+      margin: 1.5rem 0;
+    }
+
+    .file-input-container label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 15px;
+      border: 2px dashed #4a8c3a;
+      border-radius: 10px;
+      background: #f8fff8;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+      background: #f0fff0;
+      border-color: #2d5a27;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #4a8c3a, #2d5a27);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      box-shadow: 0 8px 25px rgba(74, 140, 58, 0.3);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(74, 140, 58, 0.4);
+    }
+
+    .submit-btn:active {
+      transform: translateY(-1px);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .form-container {
+        padding: 2rem 1.5rem;
+        margin: 0 1rem;
+      }
+
+      .logo {
+        width: 100px;
+        height: 100px;
+      }
+
+      .form-header h2 {
+        font-size: 1rem;
+      }
+    }
+
+    /* Additional decorative elements */
+    .decorative-circle {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      z-index: 1;
+    }
+
+    .circle-1 {
+      top: 10%;
+      left: 10%;
+      width: 150px;
+      height: 150px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .circle-2 {
+      bottom: 15%;
+      right: 15%;
+      width: 100px;
+      height: 100px;
+      animation: float 4s ease-in-out infinite reverse;
+    }
+
+    .circle-3 {
+      top: 60%;
+      left: 5%;
+      width: 80px;
+      height: 80px;
+      animation: float 5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>Class Registration Form</h2>
-  <form action="api/save.php" method="post" enctype="multipart/form-data">
-    
-    <!-- Name -->
-    <input type="text" name="name" placeholder="Full Name" required>
+  <!-- Decorative background circles -->
+  <div class="decorative-circle circle-1"></div>
+  <div class="decorative-circle circle-2"></div>
+  <div class="decorative-circle circle-3"></div>
 
-    <!-- Student No -->
-    <input type="text" name="student_no" placeholder="Student No." required>
+  <div class="container">
+    <!-- Logo -->
+    <div class="logo"></div>
 
-    <!-- Role -->
-    <select name="role" id="role" required onchange="updatePositionOptions()">
-      <option value="" disabled selected>Select Role</option>
-      <option value="Executive">Executive</option>
-      <option value="Class Officer">Class Officers</option>
-      <option value="Member">Member</option>
-    </select>
+    <!-- Form Header -->
+    <div class="form-header">
+      <h2>CLASS REGISTRATION FORM</h2>
+    </div>
 
-    <!-- Position -->
-    <select name="position" id="position" required>
-      <option value="" disabled selected>Select Position</option>
-    </select>
+    <!-- Form Container -->
+    <div class="form-container">
+      <form action="api/save.php" method="post" enctype="multipart/form-data">
+        
+        <div class="floating-label">
+          <input type="text" name="name" placeholder="Full Name" required>
+          <label>Full Name</label>
+        </div>
 
-    <script>
-      const positions = {
+        <div class="floating-label">
+          <input type="text" name="student_no" placeholder="Student No." required>
+          <label>Student No.</label>
+        </div>
+
+        <div class="floating-label">
+          <select name="role" id="role" required onchange="updatePositionOptions()">
+            <option value="" disabled selected></option>
+            <option value="Executive">Executive</option>
+            <option value="Class Officer">Class Officers</option>
+            <option value="Member">Member</option>
+          </select>
+          <label>Select Role</label>
+        </div>
+
+        <div class="floating-label">
+          <select name="position" id="position" required>
+            <option value="" disabled selected></option>
+          </select>
+          <label>Select Position</label>
+        </div>
+
+        <div class="floating-label">
+          <input type="text" name="address" placeholder="Address">
+          <label>Address</label>
+        </div>
+
+        <div class="floating-label">
+          <select name="course" required>
+            <option value="" disabled selected></option>
+            <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - A">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - A</option>
+            <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - B">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - B</option>
+            <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - C">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - C</option>
+          </select>
+          <label>College, Program, Major, and Section</label>
+        </div>
+
+        <div class="floating-label">
+          <select name="year_level" required>
+            <option value="" disabled selected></option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+          <label>Year Level</label>
+        </div>
+
+        <div class="floating-label">
+          <input type="text" name="landline" placeholder="Mobile Number" required>
+          <label>Mobile Number</label>
+        </div>
+
+        <div class="floating-label">
+          <input type="text" name="contact_person" placeholder="Emergency Contact Person" required>
+          <label>Emergency Contact Person</label>
+        </div>
+
+        <div class="floating-label">
+          <input type="text" name="mobile" placeholder="Emergency Contact Number" required>
+          <label>Emergency Contact Number</label>
+        </div>
+
+        <div class="file-input-container">
+          <label>Upload Profile Picture:</label>
+          <input type="file" name="profile_pic" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const positions = {
       "Executive": [
         "President",
         "Vice President Internal",
@@ -48,7 +446,6 @@
         "Creatives and Multimedia Committee Head",
         "Student's Behavior Discipline and Grievance Committee Head",
         "Computer Science, Information, and Technology Committee Head"
-
       ],
       "Class Officer": [
         "Mayor",
@@ -62,58 +459,81 @@
       "Member": [
         "Member"
       ]
-      };
+    };
 
-      function updatePositionOptions() {
-      const role = document.getElementById('role').value;
+    function updatePositionOptions() {
+      const role = document.getElementById('role');
       const positionSelect = document.getElementById('position');
-      positionSelect.innerHTML = '<option value="" disabled selected>Select Position</option>';
-      if (positions[role]) {
-        positions[role].forEach(function(pos) {
-        const opt = document.createElement('option');
-        opt.value = pos;
-        opt.textContent = pos;
-        positionSelect.appendChild(opt);
+      positionSelect.innerHTML = '<option value="" disabled selected></option>';
+      
+      if (positions[role.value]) {
+        positions[role.value].forEach(function(pos) {
+          const opt = document.createElement('option');
+          opt.value = pos;
+          opt.textContent = pos;
+          positionSelect.appendChild(opt);
         });
       }
+
+      // Update has-value class for role select
+      if (role.value) {
+        role.classList.add('has-value');
+      } else {
+        role.classList.remove('has-value');
       }
-    </script>
 
-    <!-- Address -->
-    <input type="text" name="address" placeholder="Address">
+      // Reset position select value class
+      positionSelect.classList.remove('has-value');
+    }
 
-    <!-- Course -->
-    <select name="course" required>
-      <option value="" disabled selected>College, Program, Major, and Section</option>
-      <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - A">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - A</option>
-      <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - B">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - B</option>
-      <option value="COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - C">COLLEGE OF COMPUTING STUDIES - COMPUTER SCIENCE - C</option>
-    </select>
+    // Add event listeners to handle floating labels for all inputs and selects
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = document.querySelectorAll('.floating-label input');
+      const selects = document.querySelectorAll('.floating-label select');
 
-    <!-- Year Level -->
-    <select name="year_level" required>
-      <option value="" disabled selected>Year Level</option>
-      <option value="1st Year">1st Year</option>
-      <option value="2nd Year">2nd Year</option>
-      <option value="3rd Year">3rd Year</option>
-      <option value="4th Year">4th Year</option>
-    </select>
+      // Handle inputs
+      inputs.forEach(input => {
+        // Check on load if input has value
+        if (input.value) {
+          input.classList.add('has-value');
+        }
 
-    <!-- Landline (optional) -->
-    <input type="text" name="landline" placeholder="Mobile Number" required>
+        // Handle input events
+        input.addEventListener('input', function() {
+          if (this.value) {
+            this.classList.add('has-value');
+          } else {
+            this.classList.remove('has-value');
+          }
+        });
 
-    <!-- Emergency Contact Person -->
-    <input type="text" name="contact_person" placeholder="Emergency Contact Person" required>
+        // Handle focus events
+        input.addEventListener('blur', function() {
+          if (this.value) {
+            this.classList.add('has-value');
+          } else {
+            this.classList.remove('has-value');
+          }
+        });
+      });
 
-    <!-- Emergency Contact Number -->
-    <input type="text" name="mobile" placeholder="Emergency Contact Number"required>
+      // Handle selects
+      selects.forEach(select => {
+        // Check on load if select has value
+        if (select.value) {
+          select.classList.add('has-value');
+        }
 
-    <!-- Profile Picture -->
-    <label>Upload Profile Picture:</label>
-    <input type="file" name="profile_pic" accept="image/*" required>
-
-    <!-- Submit -->
-    <button type="submit">Submit</button>
-  </form>
+        // Handle change events
+        select.addEventListener('change', function() {
+          if (this.value) {
+            this.classList.add('has-value');
+          } else {
+            this.classList.remove('has-value');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
